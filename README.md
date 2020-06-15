@@ -1,2 +1,3 @@
-# bgviewer
-Visualisation and exploration of brainglobe atlases
+#bgviewer
+
+Visualisation and exploration of brain atlases
