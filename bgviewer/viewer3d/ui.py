@@ -62,7 +62,7 @@ class StandardItem(QStandardItem):
         elif self.depth < 5:
             return 14, QColor(220, 220, 220)
         else:
-            return 16, QColor(180, 180, 180)
+            return 12, QColor(180, 180, 180)
 
 
 # ---------------------------------------------------------------------------- #
@@ -116,7 +116,7 @@ class Window(QMainWindow):
         main_layout = QHBoxLayout()
         main_layout.addWidget(left_widget)
         main_layout.addWidget(self.right_widget)
-        main_layout.setStretch(0, 40)
+        main_layout.setStretch(0, 80)
         main_layout.setStretch(1, 200)
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
@@ -146,7 +146,9 @@ class Window(QMainWindow):
         treeView = QTreeView()
         treeView.setExpandsOnDoubleClick(False)
         treeView.setHeaderHidden(True)
-        treeView.setStyleSheet("background-color: rgb(80, 80, 80);")
+        treeView.setStyleSheet(
+            "background-color: rgb(80, 80, 80); border-radius: 12px; padding: 20px 12px;"
+        )
 
         treeModel = QStandardItemModel()
         rootNode = treeModel.invisibleRootItem()
