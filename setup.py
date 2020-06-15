@@ -40,5 +40,6 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
     ],
+    entry_points={"console_scripts": ["bgviewer = bgviewer.viewer:main"]},
     zip_safe=False,
 )
