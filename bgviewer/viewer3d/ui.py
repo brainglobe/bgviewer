@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QMainWindow,
+    QLabel,
 )
 from PyQt5.Qt import QStandardItemModel, QStandardItem, Qt
 from PyQt5.QtGui import QFont, QColor
@@ -76,9 +77,29 @@ class StandardItem(QStandardItem):
 #                                   UI CLASS                                   #
 # ---------------------------------------------------------------------------- #
 
+# for ref: https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qtreeview
+tree_css = """
+QTreeView {background-color: BGCOLOR; border-radius: 12px; padding: 20px 12px;} 
+
+QTreeView::item:hover {
+    background-color: TXTCOLOR; color: BGCOLOR;
+}
+QTreeView::item:selected {
+    background-color: TXTCOLOR; color: BGCOLOR;
+}
+QTreeView::item:selected:active {
+    background-color: TXTCOLOR; color: BGCOLOR;
+}
+
+
+QTreeView::item:selected:!active {
+    background-color: TXTCOLOR; color: BGCOLOR;
+}
+"""
+
 
 class Window(QMainWindow):
-    def __init__(self, *args, theme="dark", **kwargs):
+    def __init__(self, *args, theme="dark", fullscreen=True, **kwargs):
         """
             Create the pyqt window and the widgets
         """
@@ -91,10 +112,13 @@ class Window(QMainWindow):
         self.palette = palettes[theme]
 
         # set the title of main window
-        self.setWindowTitle("Brainrender GUI")
+        self.setWindowTitle("BGVIEWER")
 
         # set the size of window
-        self.showFullScreen()
+        if fullscreen:
+            self.showFullScreen()
+        else:
+            self.resize(1200, 700)
 
         # Change baground color
         self.setStyleSheet(
@@ -113,6 +137,11 @@ class Window(QMainWindow):
         self.left_layout = QVBoxLayout()
 
         self.hierarchy = self.hierarchy_widget()
+        label = QLabel(self.atlas.atlas_name)
+        label.setStyleSheet(
+            f'color: {self.palette["text"]}; font-weight:800; font-size:20px'
+        )
+        self.left_layout.addWidget(label)
         self.left_layout.addWidget(self.hierarchy)
         left_widget = QWidget()
         left_widget.setLayout(self.left_layout)
@@ -156,16 +185,16 @@ class Window(QMainWindow):
             it with structures names from the brainglobe-api's Atlas.hierarchy
             tree view.
         """
+        # Update css
+        css = tree_css.replace("BGCOLOR", self.palette["background"])
+        css = css.replace("TXTCOLOR", self.palette["text"])
+        css = css.replace("HIGHLIGHT", self.palette["highlight"])
 
         # Create QTree widget
         treeView = QTreeView()
         treeView.setExpandsOnDoubleClick(False)
         treeView.setHeaderHidden(True)
-        treeView.setStyleSheet(
-            "background-color: {}; border-radius: 12px; padding: 20px 12px;".format(
-                self.palette["background"]
-            )
-        )
+        treeView.setStyleSheet(css)
 
         treeModel = QStandardItemModel()
         rootNode = treeModel.invisibleRootItem()

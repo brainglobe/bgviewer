@@ -58,8 +58,12 @@ class MainWindow(Window, Scene):
             When an item on the hierarchy tree is double clicked, the
             corresponding mesh is added/removed from the brainrender scene
         """
-        # Get time [instance of StandardItem]
-        item = self.hierarchy.selectedIndexes()[0]
+        # Get item
+        idxs = self.hierarchy.selectedIndexes()
+        if idxs:
+            item = idxs[0]
+        else:
+            return
         item = item.model().itemFromIndex(val)
 
         # Get region name
