@@ -1,1 +1,2 @@
 brainatlas-api
+napari[pyqt5]
