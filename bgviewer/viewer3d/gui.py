@@ -1,6 +1,5 @@
 from vedo import Plotter
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont
 import brainrender
 from brainrender.Utils.camera import set_camera
 from brainrender.scene import Scene
@@ -8,9 +7,8 @@ from brainrender.scene import Scene
 from bgviewer.viewer3d.ui import Window
 
 
-
-brainrender.BACKGROUND_COLOR = 'blackboard'
-brainrender.ROOT_COLOR = [.8, .8, .8]
+brainrender.BACKGROUND_COLOR = "blackboard"
+brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 
 """
     A pyqt5-based GUI for visualising brian regions in 3d. 
@@ -19,7 +17,8 @@ brainrender.ROOT_COLOR = [.8, .8, .8]
     where the regions meshes are visualised
 """
 
-class MainWindow(Window,  Scene):
+
+class MainWindow(Window, Scene):
     # ---------------------------------- create ---------------------------------- #
     def __init__(self, *args, atlas=None, **kwargs):
         """
@@ -34,7 +33,6 @@ class MainWindow(Window,  Scene):
 
         # update plotter
         self._update()
-
 
     def setup_plotter(self):
         """
@@ -62,26 +60,25 @@ class MainWindow(Window,  Scene):
         region = item.tag
 
         # Add/remove mesh
-        if region == 'root' or region == 'grey':
+        if region == "root" or region == "grey":
             if self.root is None:
                 self.add_root()
         else:
-            if region not in self.actors['regions'].keys():
+            if region not in self.actors["regions"].keys():
                 # Add region
-                fnt = QFont('Open Sans', 12)
+                fnt = QFont("Open Sans", 12)
                 fnt.setBold(True)
                 item.setFont(fnt)
 
                 self.add_brain_regions(region)
             else:
-                del self.actors['regions'][region]
+                del self.actors["regions"][region]
 
             # Update hierarchy's item font
             item.toggle_active()
 
         # Update brainrender scene
         self._update()
-
 
     def _update(self):
         """
@@ -90,7 +87,11 @@ class MainWindow(Window,  Scene):
         """
         self.apply_render_style()
 
-        self.plotter.show(*self.get_actors(), interactorStyle=0, bg=brainrender.BACKGROUND_COLOR)
+        self.plotter.show(
+            *self.get_actors(),
+            interactorStyle=0,
+            bg=brainrender.BACKGROUND_COLOR,
+        )
 
         # Fake a button press to force update
         self.plotter.interactor.MiddleButtonPressEvent()
@@ -102,4 +103,3 @@ class MainWindow(Window,  Scene):
             Disable the interactor before closing to prevent it from trying to act on a already deleted items
         """
         self.vtkWidget.close()
-

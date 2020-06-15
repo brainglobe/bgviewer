@@ -1,9 +1,15 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (
+    QTreeView,
+    QHBoxLayout,
+    QTabWidget,
+    QWidget,
+    QVBoxLayout,
+    QMainWindow,
+)
 from PyQt5.Qt import QStandardItemModel, QStandardItem
 from PyQt5.QtGui import QFont, QColor
 from PyQt5 import QtCore
 
-import sys
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
@@ -11,9 +17,9 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
     Handles the UI for the 3d viewer based on the pyqt5 application
 """
 
-# -------------------------------- tree items -------------------------------- #
+
 class StandardItem(QStandardItem):
-    def __init__(self, txt='', tag=None, depth=0):
+    def __init__(self, txt="", tag=None, depth=0):
         """
             Items in the tree list with some
             extended functionality to specify/update
@@ -22,12 +28,12 @@ class StandardItem(QStandardItem):
         super().__init__()
         self.depth = depth  # depth in the hierarchy structure
         self.tag = tag
- 
+
         # Set font color/size
         fs, color = self.get_font_from_depth()
-        self.bold = True # but will be inverted
+        self.bold = True  # but will be inverted
         self.toggle_active()
- 
+
         # Set text
         self.setEditable(False)
         self.setForeground(color)
@@ -42,7 +48,7 @@ class StandardItem(QStandardItem):
         self.bold = not self.bold
         fs, color = self.get_font_from_depth()
 
-        fnt = QFont('Roboto', fs)
+        fnt = QFont("Roboto", fs)
         fnt.setBold(self.bold)
         self.setFont(fnt)
 
@@ -53,7 +59,7 @@ class StandardItem(QStandardItem):
         """
         if self.depth < 2:
             return 16, QColor(255, 255, 255)
-        elif self.depth< 5:
+        elif self.depth < 5:
             return 14, QColor(220, 220, 220)
         else:
             return 16, QColor(180, 180, 180)
@@ -63,6 +69,7 @@ class StandardItem(QStandardItem):
 #                                   UI CLASS                                   #
 # ---------------------------------------------------------------------------- #
 
+
 class Window(QMainWindow):
     def __init__(self):
         """
@@ -71,13 +78,13 @@ class Window(QMainWindow):
         super().__init__()
 
         # set the title of main window
-        self.setWindowTitle('Brainrender GUI')
+        self.setWindowTitle("Brainrender GUI")
 
         # set the size of window
         self.showFullScreen()
 
         # Change baground color
-        self.setStyleSheet("background-color: rgb(40, 40, 40);") 
+        self.setStyleSheet("background-color: rgb(40, 40, 40);")
 
         # add tabs
         self.tab1 = self.brainrender_canvas()
@@ -98,10 +105,12 @@ class Window(QMainWindow):
         # Right layout
         self.right_widget = QTabWidget()
         self.right_widget.tabBar().setObjectName("mainTab")
-        self.right_widget.addTab(self.tab1, '')
+        self.right_widget.addTab(self.tab1, "")
         self.right_widget.setCurrentIndex(0)
-        self.right_widget.setStyleSheet('''QTabBar::tab{width: 0; \
-            height: 0; margin: 0; padding: 0; border: none;}''')
+        self.right_widget.setStyleSheet(
+            """QTabBar::tab{width: 0; \
+            height: 0; margin: 0; padding: 0; border: none;}"""
+        )
 
         # Put everything together
         main_layout = QHBoxLayout()
@@ -137,8 +146,8 @@ class Window(QMainWindow):
         treeView = QTreeView()
         treeView.setExpandsOnDoubleClick(False)
         treeView.setHeaderHidden(True)
-        treeView.setStyleSheet("background-color: rgb(80, 80, 80);") 
- 
+        treeView.setStyleSheet("background-color: rgb(80, 80, 80);")
+
         treeModel = QStandardItemModel()
         rootNode = treeModel.invisibleRootItem()
 
@@ -148,10 +157,11 @@ class Window(QMainWindow):
         for n, node in enumerate(tree.expand_tree()):
             # Get Node info
             node = tree.get_node(node)
-            if node.tag in ['VS', 'fiber tracts']: continue 
+            if node.tag in ["VS", "fiber tracts"]:
+                continue
 
             # Get brainregion name
-            name = self.atlas._get_from_structure(node.tag, 'name')
+            name = self.atlas._get_from_structure(node.tag, "name")
 
             # Create Item
             item = StandardItem(name, node.tag, tree.depth(node.identifier))
@@ -163,7 +173,7 @@ class Window(QMainWindow):
                     continue
                 else:
                     items[parent.identifier].appendRow(item)
-            
+
             # Keep track of added nodes
             items[node.identifier] = item
             if n == 0:
@@ -179,7 +189,8 @@ class Window(QMainWindow):
         return treeView
 
     def keyPressEvent(self, event):
-      if event.key() == QtCore.Qt.Key_Escape or event.key() == QtCore.Qt.Key_Q:
-         self.close()
-
-
+        if (
+            event.key() == QtCore.Qt.Key_Escape
+            or event.key() == QtCore.Qt.Key_Q
+        ):
+            self.close()
