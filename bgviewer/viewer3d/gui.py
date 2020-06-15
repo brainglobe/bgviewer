@@ -1,5 +1,8 @@
 from vedo import Plotter
 from PyQt5.QtGui import QFont
+from PyQt5.Qt import Qt
+from PyQt5 import QtCore
+
 import brainrender
 from brainrender.Utils.camera import set_camera
 from brainrender.scene import Scene
@@ -7,7 +10,6 @@ from brainrender.scene import Scene
 from bgviewer.viewer3d.ui import Window
 
 
-brainrender.BACKGROUND_COLOR = "blackboard"
 brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 
 """
@@ -25,14 +27,18 @@ class MainWindow(Window, Scene):
             Adds brainrender/vedo functionality to the 
             pyqt5 application created in bgviewer.viewer3d.ui.Window
         """
-        Window.__init__(self)
+        Window.__init__(self, *args, **kwargs)
         Scene.__init__(self, *args, atlas=atlas, **kwargs)
 
         # Create a new vedo plotter
+        brainrender.BACKGROUND_COLOR = [228, 229, 230]
         self.setup_plotter()
 
         # update plotter
         self._update()
+
+        # Add inset
+        self._get_inset()
 
     def setup_plotter(self):
         """
@@ -58,6 +64,14 @@ class MainWindow(Window, Scene):
 
         # Get region name
         region = item.tag
+
+        # Toggle checkbox
+        if not item._checked:
+            item.setCheckState(Qt.Checked)
+            item._checked = True
+        else:
+            item.setCheckState(Qt.Unchecked)
+            item._checked = False
 
         # Add/remove mesh
         if region == "root" or region == "grey":
@@ -98,6 +112,14 @@ class MainWindow(Window, Scene):
         self.plotter.interactor.MiddleButtonReleaseEvent()
 
     # ----------------------------------- Close ---------------------------------- #
+    def keyPressEvent(self, event):
+        if (
+            event.key() == QtCore.Qt.Key_Escape
+            or event.key() == QtCore.Qt.Key_Q
+            or event.key() == QtCore.Qt.Key_q
+        ):
+            self.close()
+
     def onClose(self):
         """
             Disable the interactor before closing to prevent it from trying to act on a already deleted items

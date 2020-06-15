@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QMainWindow,
 )
-from PyQt5.Qt import QStandardItemModel, QStandardItem
+from PyQt5.Qt import QStandardItemModel, QStandardItem, Qt
 from PyQt5.QtGui import QFont, QColor
-from PyQt5 import QtCore
+from napari.utils.theme import palettes
 
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
@@ -19,7 +19,7 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class StandardItem(QStandardItem):
-    def __init__(self, txt="", tag=None, depth=0):
+    def __init__(self, txt="", tag=None, depth=0, color=None):
         """
             Items in the tree list with some
             extended functionality to specify/update
@@ -30,14 +30,21 @@ class StandardItem(QStandardItem):
         self.tag = tag
 
         # Set font color/size
-        fs, color = self.get_font_from_depth()
         self.bold = True  # but will be inverted
         self.toggle_active()
 
         # Set text
         self.setEditable(False)
-        self.setForeground(color)
+        rgb = color.replace(")", "").replace(" ", "").split("(")[-1].split(",")
+        self.setForeground(QColor(*[int(r) for r in rgb]))
         self.setText(txt)
+
+        # Set checkbox
+        self.setFlags(
+            self.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable
+        )
+        self.setCheckState(Qt.Unchecked)
+        self._checked = False
 
     def toggle_active(self):
         """
@@ -46,7 +53,7 @@ class StandardItem(QStandardItem):
             to highlight the fact. 
         """
         self.bold = not self.bold
-        fs, color = self.get_font_from_depth()
+        fs = self.get_font_from_depth()
 
         fnt = QFont("Roboto", fs)
         fnt.setBold(self.bold)
@@ -58,11 +65,11 @@ class StandardItem(QStandardItem):
                 font-size, bold, color
         """
         if self.depth < 2:
-            return 16, QColor(255, 255, 255)
+            return 16
         elif self.depth < 5:
-            return 14, QColor(220, 220, 220)
+            return 14
         else:
-            return 12, QColor(180, 180, 180)
+            return 12
 
 
 # ---------------------------------------------------------------------------- #
@@ -71,11 +78,17 @@ class StandardItem(QStandardItem):
 
 
 class Window(QMainWindow):
-    def __init__(self):
+    def __init__(self, *args, theme="dark", **kwargs):
         """
             Create the pyqt window and the widgets
         """
         super().__init__()
+
+        if theme not in palettes.keys():
+            raise ValueError(
+                f"theme argument invalid: {theme}, should be either dark or light"
+            )
+        self.palette = palettes[theme]
 
         # set the title of main window
         self.setWindowTitle("Brainrender GUI")
@@ -84,7 +97,9 @@ class Window(QMainWindow):
         self.showFullScreen()
 
         # Change baground color
-        self.setStyleSheet("background-color: rgb(40, 40, 40);")
+        self.setStyleSheet(
+            "background-color: {};".format(self.palette["foreground"])
+        )
 
         # add tabs
         self.tab1 = self.brainrender_canvas()
@@ -147,7 +162,9 @@ class Window(QMainWindow):
         treeView.setExpandsOnDoubleClick(False)
         treeView.setHeaderHidden(True)
         treeView.setStyleSheet(
-            "background-color: rgb(80, 80, 80); border-radius: 12px; padding: 20px 12px;"
+            "background-color: {}; border-radius: 12px; padding: 20px 12px;".format(
+                self.palette["background"]
+            )
         )
 
         treeModel = QStandardItemModel()
@@ -166,7 +183,12 @@ class Window(QMainWindow):
             name = self.atlas._get_from_structure(node.tag, "name")
 
             # Create Item
-            item = StandardItem(name, node.tag, tree.depth(node.identifier))
+            item = StandardItem(
+                name,
+                node.tag,
+                tree.depth(node.identifier),
+                self.palette["text"],
+            )
 
             # Get/assign parents
             parent = tree.parent(node.identifier)
@@ -187,12 +209,5 @@ class Window(QMainWindow):
         treeView.expandToDepth(2)
 
         # Add callback
-        treeView.doubleClicked.connect(self.show_hide_mesh)
+        treeView.clicked.connect(self.show_hide_mesh)
         return treeView
-
-    def keyPressEvent(self, event):
-        if (
-            event.key() == QtCore.Qt.Key_Escape
-            or event.key() == QtCore.Qt.Key_Q
-        ):
-            self.close()
