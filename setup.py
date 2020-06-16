@@ -40,6 +40,11 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
     ],
-    entry_points={"console_scripts": ["bgviewer = bgviewer.viewer:main"]},
+    entry_points={
+        "console_scripts": [
+            "bgviewer = bgviewer.viewer:main",
+            "bgviewer3d = bgviewer.viewer3d:main",
+        ]
+    },
     zip_safe=False,
 )
