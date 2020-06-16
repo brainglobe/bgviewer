@@ -120,7 +120,6 @@ class MainWindow(Window, Scene):
         if (
             event.key() == QtCore.Qt.Key_Escape
             or event.key() == QtCore.Qt.Key_Q
-            or event.key() == QtCore.Qt.Key_q
         ):
             self.close()
 
