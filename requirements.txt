@@ -1,3 +1,4 @@
 brainatlas-api
 napari[pyqt5]
 brainrender
+pyqt5
