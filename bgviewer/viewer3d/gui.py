@@ -20,15 +20,15 @@ brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 """
 
 
-class MainWindow(Window, Scene):
+class MainWindow(Scene, Window):
     # ---------------------------------- create ---------------------------------- #
     def __init__(self, *args, atlas=None, **kwargs):
         """
             Adds brainrender/vedo functionality to the 
             pyqt5 application created in bgviewer.viewer3d.ui.Window
         """
-        Window.__init__(self, *args, **kwargs)
         Scene.__init__(self, *args, atlas=atlas, **kwargs)
+        Window.__init__(self, *args, **kwargs)
 
         # Create a new vedo plotter
         brainrender.BACKGROUND_COLOR = [228, 229, 230]

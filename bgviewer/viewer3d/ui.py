@@ -91,7 +91,6 @@ QTreeView::item:selected:active {
     background-color: TXTCOLOR; color: BGCOLOR;
 }
 
-
 QTreeView::item:selected:!active {
     background-color: TXTCOLOR; color: BGCOLOR;
 }
