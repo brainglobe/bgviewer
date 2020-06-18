@@ -42,10 +42,24 @@ def launch_parser():
         help="Pass the name of a brainglobe atlas to explore with the 3d viewer",
     )
 
+    parser.add_argument(
+        "-r",
+        "--rand-col",
+        dest="random_colors",
+        required=False,
+        default=False,
+        help="Pass -r True to use random colors to color brain regions",
+    )
+
     return parser
 
 
 def main():
     args = launch_parser().parse_args()
 
-    launch(theme=args.theme, fullscreen=args.fullscreen, atlas=args.atlas)
+    launch(
+        theme=args.theme,
+        fullscreen=args.fullscreen,
+        atlas=args.atlas,
+        random_colors=args.random_colors,
+    )

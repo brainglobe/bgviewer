@@ -22,10 +22,15 @@ brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 
 class MainWindow(Scene, Window):
     # ---------------------------------- create ---------------------------------- #
-    def __init__(self, *args, atlas=None, **kwargs):
+    def __init__(self, *args, atlas=None, random_colors=False, **kwargs):
         """
             Adds brainrender/vedo functionality to the 
             pyqt5 application created in bgviewer.viewer3d.ui.Window
+
+            Arguments
+            ---------
+            atlas: name of a brainatlas api atlas (or any atlas class supported by brainrender)
+            random_colors: if True brain regions are assigned a random color
         """
         Scene.__init__(self, *args, atlas=atlas, **kwargs)
         Window.__init__(self, *args, **kwargs)
@@ -33,6 +38,7 @@ class MainWindow(Scene, Window):
         # Create a new vedo plotter
         brainrender.BACKGROUND_COLOR = [228, 229, 230]
         self.setup_plotter()
+        self.random_colors = random_colors
 
         # update plotter
         self._update()
@@ -88,7 +94,14 @@ class MainWindow(Scene, Window):
                 fnt.setBold(True)
                 item.setFont(fnt)
 
-                self.add_brain_regions(region)
+                if not self.random_colors:
+                    self.add_brain_regions(region)
+                else:
+                    self.add_brain_regions(
+                        region,
+                        use_original_color=False,
+                        colors=brainrender.colors.get_random_colors(1),
+                    )
             else:
                 del self.actors["regions"][region]
 

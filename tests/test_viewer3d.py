@@ -32,7 +32,7 @@ def test_atlas(qtbot):
 
 # TODO check if this actually tests the show_hide_mesh function
 def test_add_hide(qtbot):
-    window = gui.MainWindow()
+    window = gui.MainWindow(random_colors=True)
     qtbot.addWidget(window)
     window.show()
 
