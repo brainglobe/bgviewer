@@ -94,6 +94,26 @@ QTreeView::item:selected:active {
 QTreeView::item:selected:!active {
     background-color: TXTCOLOR; color: BGCOLOR;
 }
+
+
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(CLOSED_IMG);
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(OPENED_IMG);
+}
+QTreeView::indicator:checked {
+image: url(CHECKED_IMG);
+}
+QTreeView::indicator:unchecked {
+image: url(UNCHECKED_IMG);
+} 
 """
 
 
@@ -109,6 +129,19 @@ class Window(QMainWindow):
                 f"theme argument invalid: {theme}, should be either dark or light"
             )
         self.palette = palettes[theme]
+
+        self.palette[
+            "branch_closed_img"
+        ] = f"bgviewer/viewer3d/icons/right_{theme}.svg"
+        self.palette[
+            "branch_opened_img"
+        ] = f"bgviewer/viewer3d/icons/down_{theme}.svg"
+        self.palette[
+            "checked_img"
+        ] = f"bgviewer/viewer3d/icons/checkedbox_{theme}.svg"
+        self.palette[
+            "unchecked_img"
+        ] = f"bgviewer/viewer3d/icons/box_{theme}.svg"
 
         # set the title of main window
         self.setWindowTitle("BGVIEWER")
@@ -189,11 +222,18 @@ class Window(QMainWindow):
         css = css.replace("TXTCOLOR", self.palette["text"])
         css = css.replace("HIGHLIGHT", self.palette["highlight"])
 
+        css = css.replace("CLOSED_IMG", self.palette["branch_closed_img"])
+        css = css.replace("OPENED_IMG", self.palette["branch_opened_img"])
+
+        css = css.replace("UNCHECKED_IMG", self.palette["unchecked_img"])
+        css = css.replace("CHECKED_IMG", self.palette["checked_img"])
+
         # Create QTree widget
         treeView = QTreeView()
         treeView.setExpandsOnDoubleClick(False)
         treeView.setHeaderHidden(True)
         treeView.setStyleSheet(css)
+        treeView.setWordWrap(False)
 
         treeModel = QStandardItemModel()
         rootNode = treeModel.invisibleRootItem()
