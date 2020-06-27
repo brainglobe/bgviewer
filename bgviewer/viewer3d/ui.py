@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.Qt import QStandardItemModel, QStandardItem, Qt
 from PyQt5.QtGui import QFont, QColor
 from napari.utils.theme import palettes
+import os
+from pathlib import Path
 
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
@@ -129,19 +131,25 @@ class Window(QMainWindow):
                 f"theme argument invalid: {theme}, should be either dark or light"
             )
         self.palette = palettes[theme]
+        
+        fld = Path(os.path.dirname(os.path.realpath(__file__)))
 
         self.palette[
             "branch_closed_img"
-        ] = f"bgviewer/viewer3d/icons/right_{theme}.svg"
+        ] = str(fld / 'icons' / f"right_{theme}.svg").replace('\\', '/')
+
         self.palette[
             "branch_opened_img"
-        ] = f"bgviewer/viewer3d/icons/down_{theme}.svg"
+        ] = str(fld / 'icons' / f"down_{theme}.svg").replace('\\', '/')
+
         self.palette[
             "checked_img"
-        ] = f"bgviewer/viewer3d/icons/checkedbox_{theme}.svg"
+        ] = str(fld / 'icons' / f"checkedbox_{theme}.svg").replace('\\', '/')
+
         self.palette[
             "unchecked_img"
-        ] = f"bgviewer/viewer3d/icons/box_{theme}.svg"
+        ] = str(fld / 'icons' / f"box_{theme}.svg").replace('\\', '/')
+
 
         # set the title of main window
         self.setWindowTitle("BGVIEWER")
