@@ -32,7 +32,7 @@ class MainWindow(Scene, Window):
             atlas: name of a brainatlas api atlas (or any atlas class supported by brainrender)
             random_colors: if True brain regions are assigned a random color
         """
-        Scene.__init__(self, *args, atlas=atlas, **kwargs)
+        self.scene = Scene(*args, atlas=atlas, **kwargs)
         Window.__init__(self, *args, **kwargs)
 
         # Create a new vedo plotter
@@ -44,7 +44,7 @@ class MainWindow(Scene, Window):
         self._update()
 
         # Add inset
-        self._get_inset()
+        self.scene._get_inset()
 
     def setup_plotter(self):
         """
@@ -53,10 +53,10 @@ class MainWindow(Scene, Window):
             pyqt application. 
         """
         new_plotter = Plotter(axes=None, qtWidget=self.vtkWidget)
-        self.plotter = new_plotter
+        self.scene.plotter = new_plotter
 
         # Fix camera
-        set_camera(self, self.camera)
+        set_camera(self.scene, self.scene.camera)
 
     # ---------------------------------- Update ---------------------------------- #
     def show_hide_mesh(self, val):
@@ -85,8 +85,8 @@ class MainWindow(Scene, Window):
 
         # Add/remove mesh
         if region == "root" or region == "grey":
-            if self.root is None:
-                self.add_root()
+            if self.scene.root is None:
+                self.scene.add_root()
         else:
             if region not in self.actors["regions"].keys():
                 # Add region
@@ -95,15 +95,15 @@ class MainWindow(Scene, Window):
                 item.setFont(fnt)
 
                 if not self.random_colors:
-                    self.add_brain_regions(region)
+                    self.scene.add_brain_regions(region)
                 else:
-                    self.add_brain_regions(
+                    self.scene.add_brain_regions(
                         region,
                         use_original_color=False,
                         colors=brainrender.colors.get_random_colors(1),
                     )
             else:
-                del self.actors["regions"][region]
+                del self.scene.actors["regions"][region]
 
             # Update hierarchy's item font
             item.toggle_active()
@@ -116,17 +116,17 @@ class MainWindow(Scene, Window):
             Updates the scene's Plotter to add/remove
             meshes
         """
-        self.apply_render_style()
+        self.scene.apply_render_style()
 
-        self.plotter.show(
-            *self.get_actors(),
+        self.scene.plotter.show(
+            *self.scene.get_actors(),
             interactorStyle=0,
             bg=brainrender.BACKGROUND_COLOR,
         )
 
         # Fake a button press to force update
-        self.plotter.interactor.MiddleButtonPressEvent()
-        self.plotter.interactor.MiddleButtonReleaseEvent()
+        self.scene.plotter.interactor.MiddleButtonPressEvent()
+        self.scene.plotter.interactor.MiddleButtonReleaseEvent()
 
     # ----------------------------------- Close ---------------------------------- #
     def keyPressEvent(self, event):

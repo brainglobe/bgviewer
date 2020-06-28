@@ -131,25 +131,23 @@ class Window(QMainWindow):
                 f"theme argument invalid: {theme}, should be either dark or light"
             )
         self.palette = palettes[theme]
-        
+
         fld = Path(os.path.dirname(os.path.realpath(__file__)))
+        self.palette["branch_closed_img"] = str(
+            fld / "icons" / f"right_{theme}.svg"
+        ).replace("\\", "/")
 
-        self.palette[
-            "branch_closed_img"
-        ] = str(fld / 'icons' / f"right_{theme}.svg").replace('\\', '/')
+        self.palette["branch_opened_img"] = str(
+            fld / "icons" / f"down_{theme}.svg"
+        ).replace("\\", "/")
 
-        self.palette[
-            "branch_opened_img"
-        ] = str(fld / 'icons' / f"down_{theme}.svg").replace('\\', '/')
+        self.palette["checked_img"] = str(
+            fld / "icons" / f"checkedbox_{theme}.svg"
+        ).replace("\\", "/")
 
-        self.palette[
-            "checked_img"
-        ] = str(fld / 'icons' / f"checkedbox_{theme}.svg").replace('\\', '/')
-
-        self.palette[
-            "unchecked_img"
-        ] = str(fld / 'icons' / f"box_{theme}.svg").replace('\\', '/')
-
+        self.palette["unchecked_img"] = str(
+            fld / "icons" / f"box_{theme}.svg"
+        ).replace("\\", "/")
 
         # set the title of main window
         self.setWindowTitle("BGVIEWER")
@@ -177,7 +175,7 @@ class Window(QMainWindow):
         self.left_layout = QVBoxLayout()
 
         self.hierarchy = self.hierarchy_widget()
-        label = QLabel(self.atlas.atlas_name)
+        label = QLabel(self.scene.atlas.atlas_name)
         label.setStyleSheet(
             f'color: {self.palette["text"]}; font-weight:800; font-size:20px'
         )
@@ -247,7 +245,7 @@ class Window(QMainWindow):
         rootNode = treeModel.invisibleRootItem()
 
         # Add element's hierarchy
-        tree = self.atlas.hierarchy
+        tree = self.scene.atlas.hierarchy
         items = {}
         for n, node in enumerate(tree.expand_tree()):
             # Get Node info
@@ -256,7 +254,7 @@ class Window(QMainWindow):
                 continue
 
             # Get brainregion name
-            name = self.atlas._get_from_structure(node.tag, "name")
+            name = self.scene.atlas._get_from_structure(node.tag, "name")
 
             # Create Item
             item = StandardItem(
