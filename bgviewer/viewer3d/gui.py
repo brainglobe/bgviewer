@@ -22,7 +22,9 @@ brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 
 class MainWindow(Scene, Window):
     # ---------------------------------- create ---------------------------------- #
-    def __init__(self, *args, atlas=None, axes=None, random_colors=False, **kwargs):
+    def __init__(
+        self, *args, atlas=None, axes=None, random_colors=False, **kwargs
+    ):
         """
             Adds brainrender/vedo functionality to the 
             pyqt5 application created in bgviewer.viewer3d.ui.Window
@@ -58,12 +60,12 @@ class MainWindow(Scene, Window):
         """
         if self.axes:
             axes = dict(
-                xtitle='X [um]',
-                ytitle='Y [um]',
-                ztitle='Z [um]',
+                xtitle="X [um]",
+                ytitle="Y [um]",
+                ztitle="Z [um]",
                 xTitleJustify="top-left",
-                xTitleOffset=-.1,
-                )
+                xTitleOffset=-0.1,
+            )
         else:
             axes = None
 
