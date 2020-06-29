@@ -6,11 +6,13 @@ from PyQt5 import QtCore
 import brainrender
 from brainrender.Utils.camera import set_camera
 from brainrender.scene import Scene
+from vedo import addons
 
 from bgviewer.viewer3d.ui import Window
 
 
 brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
+brainrender.BACKGROUND_COLOR = [228, 229, 230]
 
 """
     A pyqt5-based GUI for visualising brian regions in 3d. 
@@ -42,7 +44,6 @@ class MainWindow(Scene, Window):
         self.axes = axes
 
         # Create a new vedo plotter
-        brainrender.BACKGROUND_COLOR = [228, 229, 230]
         self.setup_plotter()
         self.random_colors = random_colors
 
@@ -58,19 +59,32 @@ class MainWindow(Scene, Window):
             with one attached to the qtWidget in the 
             pyqt application. 
         """
-        if self.axes:
-            axes = dict(
-                xtitle="X [um]",
-                ytitle="Y [um]",
-                ztitle="Z [um]",
-                xTitleJustify="top-left",
-                xTitleOffset=-0.1,
-            )
-        else:
-            axes = None
+        # Get embedded plotter
+        new_plotter = Plotter(qtWidget=self.vtkWidget)
+        self.scene.plotter = new_plotter
 
-        new_plotter = Plotter(axes=axes, qtWidget=self.vtkWidget)
-        self.plotter = new_plotter
+        # Get axes
+        if self.axes:
+            ax = addons.buildAxes(
+                self.scene.root,
+                xtitle="x [um]",
+                xLabelOffset=0.07,
+                xTitleOffset=0.1,
+                xTitleJustify="bottom-left",
+                ytitle="y [um]",
+                yLabelOffset=0.025,
+                yTitleOffset=0.1,
+                yTitleJustify="bottom-left",
+                ztitle="z [um]",
+                zLabelOffset=0.025,
+                zTitleOffset=0.1,
+                zTitleJustify="bottom-left",
+            )
+            for a in ax.unpack():
+                if "xtitle" in a.name or "xNumericLabel" in a.name:
+                    a.RotateZ(180)
+
+            self.scene.add_actor(ax)
 
         # Fix camera
         set_camera(self.scene, self.scene.camera)
@@ -105,7 +119,7 @@ class MainWindow(Scene, Window):
             if self.scene.root is None:
                 self.scene.add_root()
         else:
-            if region not in self.actors["regions"].keys():
+            if region not in self.scene.actors["regions"].keys():
                 # Add region
                 fnt = QFont("Open Sans", 12)
                 fnt.setBold(True)
