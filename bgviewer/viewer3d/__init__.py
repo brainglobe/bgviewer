@@ -15,14 +15,11 @@ def launch(*args, **kwargs):
 
 def launch_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-f",
-        "--full-screen",
-        dest="fullscreen",
-        required=False,
-        default=False,
-        help="Pass True to have the viewer launch in fullscreen mode",
-    )
+
+    fullscreen_parser = parser.add_mutually_exclusive_group(required=False)
+    fullscreen_parser.add_argument('--fullscreen', dest='fullscreen', action='store_true')
+    fullscreen_parser.add_argument('--no-fullscreen', dest='fullscreen', action='store_false')
+    parser.set_defaults(fullscreen=False)
 
     parser.add_argument(
         "-t",
@@ -42,14 +39,16 @@ def launch_parser():
         help="Pass the name of a brainglobe atlas to explore with the 3d viewer",
     )
 
-    parser.add_argument(
-        "-r",
-        "--rand-col",
-        dest="random_colors",
-        required=False,
-        default=False,
-        help="Pass -r True to use random colors to color brain regions",
-    )
+    randomcolors_parser = parser.add_mutually_exclusive_group(required=False)
+    randomcolors_parser.add_argument('--randomcolors', dest='randomcolors', action='store_true')
+    randomcolors_parser.add_argument('--no-randomcolors', dest='randomcolors', action='store_false')
+    parser.set_defaults(randomcolors=False)
+
+
+    axes_parser = parser.add_mutually_exclusive_group(required=False)
+    axes_parser.add_argument('--axes', dest='axes', action='store_true')
+    axes_parser.add_argument('--no-axes', dest='axes', action='store_false')
+    parser.set_defaults(axes=False)
 
     return parser
 
@@ -61,5 +60,6 @@ def main():
         theme=args.theme,
         fullscreen=args.fullscreen,
         atlas=args.atlas,
-        random_colors=args.random_colors,
+        random_colors=args.randomcolors,
+        axes=args.axes
     )

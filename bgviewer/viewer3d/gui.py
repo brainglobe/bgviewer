@@ -22,7 +22,7 @@ brainrender.ROOT_COLOR = [0.8, 0.8, 0.8]
 
 class MainWindow(Scene, Window):
     # ---------------------------------- create ---------------------------------- #
-    def __init__(self, *args, atlas=None, random_colors=False, **kwargs):
+    def __init__(self, *args, atlas=None, axes=None, random_colors=False, **kwargs):
         """
             Adds brainrender/vedo functionality to the 
             pyqt5 application created in bgviewer.viewer3d.ui.Window
@@ -31,9 +31,13 @@ class MainWindow(Scene, Window):
             ---------
             atlas: name of a brainatlas api atlas (or any atlas class supported by brainrender)
             random_colors: if True brain regions are assigned a random color
+            axes: by default it's None, so no axes are shown. If True is passed
+                Cartesian coordinates axes are shown
         """
         Scene.__init__(self, *args, atlas=atlas, **kwargs)
         Window.__init__(self, *args, **kwargs)
+
+        self.axes = axes
 
         # Create a new vedo plotter
         brainrender.BACKGROUND_COLOR = [228, 229, 230]
@@ -52,7 +56,18 @@ class MainWindow(Scene, Window):
             with one attached to the qtWidget in the 
             pyqt application. 
         """
-        new_plotter = Plotter(axes=None, qtWidget=self.vtkWidget)
+        if self.axes:
+            axes = dict(
+                xtitle='X [um]',
+                ytitle='Y [um]',
+                ztitle='Z [um]',
+                xTitleJustify="top-left",
+                xTitleOffset=-.1,
+                )
+        else:
+            axes = None
+
+        new_plotter = Plotter(axes=axes, qtWidget=self.vtkWidget)
         self.plotter = new_plotter
 
         # Fix camera
