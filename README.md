@@ -1,5 +1,7 @@
 # bgviewer
 
+**This project is now archived. To view brainglobe atlases, please see [bg-brainrender-gui](https://github.com/brainglobe/bg-brainrender-gui).**
+
 Visualisation and exploration of brain atlases from [brainglobe](https://github.com/brainglobe/brainatlas-api).
 
 
